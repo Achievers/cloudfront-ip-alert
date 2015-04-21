@@ -40,6 +40,7 @@ class IPWhiteList {
         return $data;
     }
 
+
     function checkIP($data) {
         $decodedData = json_decode($data, true);
         $lastDecodedData = array();
@@ -51,6 +52,17 @@ class IPWhiteList {
             $lastDecodedData = json_decode(file_get_contents($this->config['cloudFrontLastFile']), true);
             $lastSyncToken = $lastDecodedData['syncToken'];
         }
+
+        //Loop through old data
+        foreach($lastDecodedData['prefixes'] as $prefixes) {
+            if ($prefixes['service'] == $this->config['cloudFrontType']) {
+                $lastListOfIPs[] = $prefixes['ip_prefix'];
+            }
+        }
+        natsort($lastListOfIPs);
+        $result = array();
+        $result['lastListOfIPs'] = $lastListOfIPs;
+        $result['currentListOfIPs'] = $lastListOfIPs;  //same as before unless it has been modified.
 
         //If there is a different in sync token, output the values.
         if ($syncToken != $lastSyncToken) {
@@ -68,29 +80,21 @@ class IPWhiteList {
                 }
             }
 
-            //Loop through old data
-            foreach($lastDecodedData['prefixes'] as $prefixes) {
-                if ($prefixes['service'] == $this->config['cloudFrontType']) {
-                    $lastListOfIPs[] = $prefixes['ip_prefix'];
-                }
-            }
-
             //Sort outputs so we can compare
-            natsort($lastListOfIPs);
             natsort($listOfIPs);
 
             //If the outputs are different, then something has changed. 
+            $result['currentListOfIPs'] = $listOfIPs;
             if ($lastListOfIPs === $listOfIPs) {
-                echo 'Amazon updated the file, but no changes detected for CloudFront.';
+                $result['message'] = 'Amazon updated the file, but no changes detected for CloudFront.';
             } else {
-                echo 'Changes detected. <br/>';
-                foreach($listOfIPs as $ip) {
-                    echo $ip . "<br/>";
-                }
+                $result['message'] = 'Changes detected.';
             }
         } else {
-            echo 'No changes detected.';
+            $result['message'] = 'No changes detected.';
         }
+
+        return json_encode($result);
     }
 }
 ?>
