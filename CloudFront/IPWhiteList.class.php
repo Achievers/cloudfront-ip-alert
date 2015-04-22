@@ -63,6 +63,7 @@ class IPWhiteList {
         $result = array();
         $result['lastListOfIPs'] = $lastListOfIPs;
         $result['currentListOfIPs'] = $lastListOfIPs;  //same as before unless it has been modified.
+        $result['hasChanged'] = false; //A flag that indicate if the IP has changed.
 
         //If there is a different in sync token, output the values.
         if ($syncToken != $lastSyncToken) {
@@ -88,6 +89,7 @@ class IPWhiteList {
             if ($lastListOfIPs === $listOfIPs) {
                 $result['message'] = 'Amazon updated the file, but no changes detected for CloudFront.';
             } else {
+                $result['hasChanged'] = true;
                 $result['message'] = 'Changes detected.';
             }
         } else {
