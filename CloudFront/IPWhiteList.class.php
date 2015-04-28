@@ -54,6 +54,7 @@ class IPWhiteList {
         }
 
         //Loop through old data
+        $lastListOfIPs = array(); //stores the decoded data JSON
         foreach($lastDecodedData['prefixes'] as $prefixes) {
             if ($prefixes['service'] == $this->config['cloudFrontType']) {
                 $lastListOfIPs[] = $prefixes['ip_prefix'];
@@ -69,7 +70,6 @@ class IPWhiteList {
         if ($syncToken != $lastSyncToken) {
             //the IPs
             $listOfIPs = array();
-            $lastListOfIPs = array(); //stores the decoded data JSON
 
             //save a copy.
             file_put_contents($this->config['cloudFrontLastFile'], $data);
