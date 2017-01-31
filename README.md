@@ -19,7 +19,7 @@ The easiest way to install is via Composer.
 ```
 {
     "require": {
-        "Achievers/cloudfront-ip-alert": "0.*"
+        "achievers/cloudfront-ip-alert": "0.*"
     }
 }
 ```
