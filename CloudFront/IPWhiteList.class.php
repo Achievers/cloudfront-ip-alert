@@ -1,10 +1,17 @@
 <?php
 namespace Achievers\CloudFront;
 
-class IPWhiteList {
-    var $config;
+class IPWhiteList
+{
+    /** string[] $config */
+    private $config;
 
-    function __construct($config = array()) {
+    /**
+     * Constructor
+     * @param string[] $config
+     */
+    public function __construct($config = [])
+    {
         $defaultConfig['cloudFrontFolder'] = 'CloudFront/';
         $defaultConfig['cloudFrontType'] ="CLOUDFRONT";
         $defaultConfig['cloudFrontLastFile'] = $defaultConfig['cloudFrontFolder'] . 'ip-ranges-old.json';
@@ -15,7 +22,11 @@ class IPWhiteList {
         $this->config = array_merge($defaultConfig, $config);
     }
 
-    function getLastCloudFrontFile() {
+    /**
+     * A simple funcion to fetch the latest CloudFront IP from Amazon
+     */
+    public function getLastCloudFrontFile()
+    {
         $ch = curl_init();
 
         //curl_setopt($ch, CURLOPT_HEADER, 0);
@@ -30,7 +41,7 @@ class IPWhiteList {
         ));
 
         $data = curl_exec($ch);
-        if(curl_errno($ch)) {
+        if (curl_errno($ch)) {
             print_r(curl_getinfo($ch));
             echo 'Curl error: ' . curl_error($ch);
         }
@@ -41,7 +52,16 @@ class IPWhiteList {
     }
 
 
-    function checkIP($data) {
+    /**
+     * This function checks the difference between the last known file and the most updated file.
+     * We then keep the last known file so that the next time we can do a diff to see what changed.
+     *
+     * @param string $data The file content dof the latest CloudFront file.
+     * @return string[] an array that contains the list of last known IPs and the list of modified IPs. Also
+     * has a flag to indicate if the IP has changed or not.
+     */
+    public function checkIP($data)
+    {
         $decodedData = json_decode($data, true);
         $lastDecodedData = array();
         $syncToken = $decodedData['syncToken'];
@@ -55,7 +75,7 @@ class IPWhiteList {
 
         //Loop through old data
         $lastListOfIPs = array(); //stores the decoded data JSON
-        foreach($lastDecodedData['prefixes'] as $prefixes) {
+        foreach ($lastDecodedData['prefixes'] as $prefixes) {
             if ($prefixes['service'] == $this->config['cloudFrontType']) {
                 $lastListOfIPs[] = $prefixes['ip_prefix'];
             }
@@ -75,7 +95,7 @@ class IPWhiteList {
             file_put_contents($this->config['cloudFrontLastFile'], $data);
 
             //Loop through it
-            foreach($decodedData['prefixes'] as $prefixes) {
+            foreach ($decodedData['prefixes'] as $prefixes) {
                 if ($prefixes['service'] == $this->config['cloudFrontType']) {
                     $listOfIPs[] = $prefixes['ip_prefix'];
                 }
@@ -84,7 +104,7 @@ class IPWhiteList {
             //Sort outputs so we can compare
             natsort($listOfIPs);
 
-            //If the outputs are different, then something has changed. 
+            //If the outputs are different, then something has changed.
             $result['currentListOfIPs'] = $listOfIPs;
             if ($lastListOfIPs === $listOfIPs) {
                 $result['message'] = 'Amazon updated the file, but no changes detected for CloudFront.';
@@ -99,4 +119,3 @@ class IPWhiteList {
         return json_encode($result);
     }
 }
-?>
