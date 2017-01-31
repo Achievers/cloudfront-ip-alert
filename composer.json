@@ -1,5 +1,5 @@
 {
-    "name": "Achievers/cloudfront-ip-alert",
+    "name": "achievers/cloudfront-ip-alert",
     "description": "Display updated Amazon CloudFront IP addresses.",
     "homepage": "https://github.com/Achievers/cloudfront-ip-alert",
     "license": "MIT",
