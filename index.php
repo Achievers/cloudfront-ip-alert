@@ -3,7 +3,7 @@
  * Documentaiton
  * http://docs.aws.amazon.com/general/latest/gr/aws-ip-ranges.html
  */
-require_once('CloudFront/IPWhiteList.class.php');
+require_once('src/IPWhiteList.class.php');
 
 use Achievers\CloudFront\IPWhiteList;
 

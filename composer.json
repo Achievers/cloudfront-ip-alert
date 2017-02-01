@@ -9,6 +9,11 @@
             "email": "harris.wong@achievers.com"
         }
     ],
+    "autoload": {
+        "psr-4": {
+            "Achievers\\CloudFront\\": "src/"
+        }
+    },
     "require": {
         "php": ">=5.6.0"
     }
