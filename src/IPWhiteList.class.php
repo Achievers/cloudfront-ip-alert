@@ -12,7 +12,7 @@ class IPWhiteList
      */
     public function __construct($config = [])
     {
-        $defaultConfig['cloudFrontFolder'] = 'CloudFront/';
+        $defaultConfig['cloudFrontFolder'] = 'src/';
         $defaultConfig['cloudFrontType'] ="CLOUDFRONT";
         $defaultConfig['cloudFrontLastFile'] = $defaultConfig['cloudFrontFolder'] . 'ip-ranges-old.json';
         $defaultConfig['cloudFrontUrl'] = 'https://ip-ranges.amazonaws.com/ip-ranges.json';
