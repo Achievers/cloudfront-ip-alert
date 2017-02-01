@@ -28,7 +28,7 @@ Usage
 =====
 Take a look at index.php for an example. Here is a quick start:
 ```
-require_once('CloudFront/IPWhiteList.class.php');
+require_once('CloudFront/IPWhiteList.php');
 
 use Achievers\CloudFront\IPWhiteList;
 
