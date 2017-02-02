@@ -12,11 +12,11 @@ class IPWhiteList
      */
     public function __construct($config = [])
     {
-        $defaultConfig['cloudFrontFolder'] = 'src/';
         $defaultConfig['cloudFrontType'] ="CLOUDFRONT";
-        $defaultConfig['cloudFrontLastFile'] = $defaultConfig['cloudFrontFolder'] . 'ip-ranges-old.json';
+        $defaultConfig['cloudFrontCacheFileName'] = 'ip-ranges-old.json';
+        $defaultConfig['cloudFrontLastFile'] = 'src/ip-ranges-old.json';
         $defaultConfig['cloudFrontUrl'] = 'https://ip-ranges.amazonaws.com/ip-ranges.json';
-        $defaultConfig['cloudFrontCaCrt'] = $defaultConfig['cloudFrontFolder'] . 'ca-bundle.crt';
+        $defaultConfig['cloudFrontCaCrt'] = 'ca-bundle.crt';
 
         //Overwrite the config with the custom configs.
         $this->config = array_merge($defaultConfig, $config);
@@ -33,7 +33,7 @@ class IPWhiteList
         curl_setopt($ch, CURLOPT_URL, $this->config['cloudFrontUrl']);
         //curl_setopt($ch, CURLOPT_VERBOSE, true);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_CAPATH, $this->config['cloudFrontCaCrt']);
+        curl_setopt($ch, CURLOPT_CAPATH, realpath(__DIR__ . "/" . $this->config['cloudFrontCaCrt']));
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, true);
         curl_setopt($ch, CURLOPT_HTTPHEADER, array(
             'Accept: application/json',
@@ -67,11 +67,16 @@ class IPWhiteList
         $syncToken = $decodedData['syncToken'];
 
         //get last file token
-        $lastSyncToken = false;
-        if (file_exists($this->config['cloudFrontLastFile'])) {
-            $lastDecodedData = json_decode(file_get_contents($this->config['cloudFrontLastFile']), true);
-            $lastSyncToken = $lastDecodedData['syncToken'];
+        if (!file_exists($this->config['cloudFrontLastFile'])) {
+            // If we are running this the first time, use the last checked cloudfront file as a starter.
+            copy(realpath(__DIR__ . "/" . $this->config['cloudFrontCacheFileName']), $this->config['cloudFrontLastFile']);
         }
+        $lastDecodedData = json_decode(file_get_contents($this->config['cloudFrontLastFile']), true);
+        if (empty($lastDecodedData)) {
+            //If there was an error reading the JSON file; or if the JSON file was empty. Then don't do anything.
+            return false;
+        }
+        $lastSyncToken = $lastDecodedData['syncToken'];
 
         //Loop through old data
         $lastListOfIPs = array(); //stores the decoded data JSON
@@ -115,7 +120,6 @@ class IPWhiteList
         } else {
             $result['message'] = 'No changes detected.';
         }
-
         return json_encode($result);
     }
 }

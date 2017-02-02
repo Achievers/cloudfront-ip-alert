@@ -40,14 +40,11 @@ $data = $cloudFrontIP->checkIP($listOfIPs); //Return a list of changes
 Config
 ======
 You can pass in configuration for customization
-cloudFrontFolder
-: This is the directory where you want to store the downloaded CloudFront IP file. We will keep a copy of the most recent file.
-
 cloudFrontType
 : The CloudFront file from Amazon contains IP of different services. Default is "CLOUDFRONT".
 
 cloudFrontLastFile
-: The is the file name where we will store the most recent file as. Default 'ip-ranges-old.json'.
+: The is the full file path where we will store the most recent file as. ie. '/tmp/ip-ranges-old.json'.
 
 cloudFrontUrl
 : The URL to Amazon CloudFront file. Default 'https://ip-ranges.amazonaws.com/ip-ranges.json'
