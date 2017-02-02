@@ -84,6 +84,7 @@ $data = $cloudFrontIP->checkIP($listOfIPs);
             render: function() {
                 var that = this;
                 var lastListOfIPs = this.model.get('lastListOfIPs');
+                lastListOfIPs = _.values(lastListOfIPs);
                 var currentListOfIPs = this.model.get('currentListOfIPs');
                 var inOldButNotInNew = _.difference(lastListOfIPs, currentListOfIPs);
                 var inNewButNotInOld = _.difference(currentListOfIPs, lastListOfIPs);
